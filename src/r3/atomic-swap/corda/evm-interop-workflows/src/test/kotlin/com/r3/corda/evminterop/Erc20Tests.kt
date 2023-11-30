@@ -7,6 +7,7 @@ import net.corda.core.utilities.getOrThrow
 import org.junit.Test
 import java.math.BigInteger
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class Erc20Tests : TestNetSetup() {
 
@@ -42,11 +43,15 @@ class Erc20Tests : TestNetSetup() {
 
     @Test
     fun `can query ERC20 allowance`() {
+        val approve = alice.startFlow(
+            Erc20TokensApproveFlow(goldTokenDeployAddress, bobAddress, 1.toBigInteger())
+        ).getOrThrow()
+
         val allowance = alice.startFlow(
             Erc20TokensAllowanceFlow(goldTokenDeployAddress, aliceAddress, bobAddress)
         ).getOrThrow()
 
-        assertEquals(BigInteger.ZERO, allowance)
+        assertNotEquals(BigInteger.ZERO, allowance)
     }
 
     @Test
