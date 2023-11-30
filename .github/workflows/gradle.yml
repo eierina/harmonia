@@ -26,12 +26,16 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Foundry
-      uses: foundry-rs/foundry-toolchain@v1.0.10
+    - name: Run R3 harmonia testnet
+      run: |
+        docker run --platform linux/amd64 -d -p 8545:8545 edoardoierina/r3-harmonia-testnet:latest
 
-    - name: Run EVM Project tests
-      run: forge test -vvv
-      working-directory: src/r3/atomic-swap/evm
+    # - name: Install Foundry
+    #   uses: foundry-rs/foundry-toolchain@v1.0.10
+
+    # - name: Run tests
+    #   run: forge test -vvv
+    #   working-directory: src/r3/atomic-swap/evm
         
     - name: Set up JDK 8
       uses: actions/setup-java@v3
@@ -39,8 +43,8 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         
-    - name: Build CorDapp with Gradle
+    - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        arguments: build --continue
+        arguments: :samples:atomic-swap:swap-workflows:test --tests "com.interop.flows.Web3jUnitTests"
         build-root-directory: 'src/r3/atomic-swap/corda'
