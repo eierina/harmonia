@@ -63,6 +63,15 @@ allprojects { // Properties that you need to compile your project (The applicati
         preserveFileTimestamps = false
         reproducibleFileOrder = true
     }
+    
+    test {
+        // Set test logging options
+        testLogging {
+            // Ensure that the results of all tests are shown, not just the failed ones
+            events "passed", "skipped", "failed"
+            showStandardStreams = true
+        }
+    }
 }
 
 dependencies {
