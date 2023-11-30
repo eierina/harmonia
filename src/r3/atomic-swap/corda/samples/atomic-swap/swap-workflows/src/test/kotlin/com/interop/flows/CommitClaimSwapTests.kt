@@ -15,7 +15,6 @@ import net.corda.core.contracts.StateRef
 import net.corda.core.identity.AbstractParty
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.node.services.vault.builder
-import net.corda.core.utilities.getOrThrow
 import net.corda.testing.internal.chooseIdentity
 import org.junit.Assert
 import org.junit.Test
@@ -245,9 +244,9 @@ class CommitClaimSwapTests : TestNetSetup() {
         )))
 
         // Alice commits her asset to the protocol contract
-        val commitTxReceipt: TransactionReceipt = alice.startFlow(
+        val commitTxReceipt: TransactionReceipt = await(alice.startFlow(
             CommitWithTokenFlow(draftTxHash, goldTokenDeployAddress, amount, bobAddress, 2.toBigInteger(), listOf(charlieAddress, bobAddress))
-        ).getOrThrow()
+        ))
 
         // Sign the draft transaction. In real use cases, this only happens after the counterparty (i.e.: alice) signals
         // the acceptance of the draft transaction and the willing to continue with the swap with a commit of the
@@ -263,9 +262,9 @@ class CommitClaimSwapTests : TestNetSetup() {
         val signatures = bob.services.cordaService(DraftTxService::class.java).notarizationProofs(draftTxHash)
 
         // Bob can claim Alice's EVM committed asset
-        val claimTxReceipt: TransactionReceipt = bob.startFlow(
+        val claimTxReceipt: TransactionReceipt = await(bob.startFlow(
             ClaimCommitmentWithSignatures(draftTxHash, signatures)
-        ).getOrThrow()
+        ))
     }
 
     @Test
@@ -275,11 +274,11 @@ class CommitClaimSwapTests : TestNetSetup() {
 
         val assetTx : StateRef = await(bob.startFlow(IssueGenericAssetFlow(assetName)))
 
-        val commitTxReceipt: TransactionReceipt = alice.startFlow(
+        val commitTxReceipt: TransactionReceipt = await(alice.startFlow(
             CommitWithTokenFlow(assetTx.txhash, goldTokenDeployAddress, amount, bobAddress, BigInteger.ONE, listOf(charlieAddress))
-        ).getOrThrow()
+        ))
 
-        val commitmentHash1 = alice.startFlow(CommitmentHash(assetTx.txhash)).getOrThrow()
+        val commitmentHash1 = await(alice.startFlow(CommitmentHash(assetTx.txhash)))
 
         val commitmentHash2 = commitmentHash(
             BigInteger.valueOf(1337),
